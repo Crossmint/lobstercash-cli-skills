@@ -13,7 +13,7 @@ The Lobster Cash CLI (`lobstercash`) gives AI agents payment tools — a blockch
 Install and run the CLI via npx — no global install required:
 
 ```bash
-npx @crossmint/lobster-cli@latest --help
+npx @crossmint/lobster-cli --help
 ```
 
 Or install globally:
