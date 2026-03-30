@@ -13,33 +13,45 @@ Load the Lobster Cash CLI skill and help with wallet operations and payments.
 skill({ name: 'lobstercash' })
 ```
 
-### Step 2: Check agent status
+### Step 2: Ensure an agent exists
 
 ```bash
-lobstercash status --agent-id <id>
+lobstercash agents list
+```
+
+If no agents exist, register one with a descriptive name, description, and image URL:
+
+```bash
+lobstercash agents register --name "<descriptive name>" --description "<what the agent does>" --image-url "<avatar url>"
+```
+
+### Step 3: Check agent status
+
+```bash
+lobstercash status
 ```
 
 This checks wallet setup, authorization, balances, and payment readiness in one call.
 
-### Step 3: Identify task type from user request
+### Step 4: Identify task type from user request
 
 Use the Decision Tree in SKILL.md to select the relevant reference file.
 
-### Step 4: Read the reference file
+### Step 5: Read the reference file
 
 Based on task type, read `references/<topic>.md`.
 
-### Step 5: Execute task
+### Step 6: Execute task
 
 **Key things to verify:**
 
+- An agent exists (`lobstercash agents list`)
 - Wallet is configured (`lobstercash status`)
 - Balance covers the operation (`lobstercash balance`)
-- Use `--agent-id` on every command
 - Confirm with user before sending tokens or requesting cards
 - Follow HITL pattern for approval URLs (do not auto-poll)
 
-### Step 6: Summarize
+### Step 7: Summarize
 
 ```
 === Lobster Cash Task Complete ===

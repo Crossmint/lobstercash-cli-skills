@@ -5,7 +5,7 @@ Request a virtual card backed by the user's credit card. This is the fastest pay
 ## Command
 
 ```bash
-lobstercash request card --amount <amount> --description "<description>" --agent-id <id>
+lobstercash request card --amount <amount> --description "<description>"
 ```
 
 ## What you need before running
@@ -41,7 +41,7 @@ Do not proceed until the user confirms they have approved.
 
 ## After user approves
 
-Run `lobstercash cards list --agent-id <id>` to verify the card was created. Then proceed with the user's task — see `references/cards.md` for listing, revealing credentials, and checkout.
+Run `lobstercash cards list` to verify the card was created. Then proceed with the user's task — see `references/cards.md` for listing, revealing credentials, and checkout.
 
 ## Gotchas
 

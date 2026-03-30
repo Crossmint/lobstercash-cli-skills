@@ -5,7 +5,7 @@ This is the **first command to run** before any purchase. It checks wallet, bala
 ## Command
 
 ```bash
-lobstercash status --agent-id <id>
+lobstercash status
 ```
 
 ## Key Output Fields
@@ -19,7 +19,7 @@ lobstercash status --agent-id <id>
 
 ## Flow A: "I want to see my configured payments"
 
-1. Run `lobstercash status --agent-id <id>`
+1. Run `lobstercash status`
 2. Present the results to the user conversationally:
    - If `ready: true`: summarize their balances and active cards
    - If `authorized: false`: the agent isn't set up yet — use `lobstercash request card` or `lobstercash request deposit` which handle setup automatically
@@ -38,7 +38,7 @@ lobstercash status --agent-id <id>
 
 1. First show what's available: run `lobstercash store` and present options
 2. When the user picks something, **check the integration's `paymentMethods`** from the store output
-3. Run `lobstercash status --agent-id <id>`
+3. Run `lobstercash status`
 4. Match the payment path to what the integration supports:
 
 ### Choosing the right payment method
@@ -46,7 +46,7 @@ lobstercash status --agent-id <id>
 Each integration in `lobstercash store` lists its supported `paymentMethods`: `card`, `crypto`, or both.
 
 - **Integration supports `card`** → use `lobstercash request card` to create a virtual card. This works even without wallet setup or USDC — the card is backed by the user's credit card.
-- **Integration supports `crypto` only** → the user needs a configured wallet with USDC. If `ready: false`, use `lobstercash request deposit --amount <needed> --agent-id <id>` to generate a deposit link (this bundles wallet setup if needed).
+- **Integration supports `crypto` only** → the user needs a configured wallet with USDC. If `ready: false`, use `lobstercash request deposit --amount <needed>` to generate a deposit link (this bundles wallet setup if needed).
 - **Integration supports both** → prefer `card` if the user doesn't have crypto funds, since it's the fastest path.
 
 **Always check `paymentMethods` from `lobstercash store` output.** Never assume which method an integration uses.
@@ -60,7 +60,7 @@ Each integration in `lobstercash store` lists its supported `paymentMethods`: `c
 > I'll set up a virtual card for your purchase. Please approve here: [approval URL from `request card`]
 > This will also set up your payment wallet automatically.
 
-**If the integration only supports `crypto`**: use `lobstercash request deposit --amount <needed> --agent-id <id>`. This bundles wallet setup if needed — one link for the user to approve and deposit. No separate wallet connect step.
+**If the integration only supports `crypto`**: use `lobstercash request deposit --amount <needed>`. This bundles wallet setup if needed — one link for the user to approve and deposit. No separate wallet connect step.
 
 > I'll get you set up with USDC for this. Please approve and deposit here: [approval URL from `request deposit`]
 
@@ -68,7 +68,7 @@ Each integration in `lobstercash store` lists its supported `paymentMethods`: `c
 
 **If the integration supports `card`**: go directly to `lobstercash request card` — no USDC needed.
 
-**If the integration only supports `crypto`**: use `lobstercash request deposit --amount <needed> --agent-id <id>`. Calculate the amount the user needs (purchase price minus current balance, or the full amount if balance is zero).
+**If the integration only supports `crypto`**: use `lobstercash request deposit --amount <needed>`. Calculate the amount the user needs (purchase price minus current balance, or the full amount if balance is zero).
 
 > You need $X USDC for this. Please deposit here: [approval URL from `request deposit`]
 

@@ -24,9 +24,7 @@ npm install -g @crossmint/lobster-cli
 
 After installation, all commands are available via the `lobstercash` binary.
 
-The `--agent-id <id>` flag scopes every command to a specific agent's wallet. Always pass it explicitly.
-
-**Before any crypto command** (`send`, `x402 fetch`, `tx create`), always run `lobstercash status --agent-id <id>` first. If the wallet isn't configured or funds are insufficient, route through `request deposit` — it bundles wallet setup automatically. For card purchases, `request card` also bundles setup. Only use `lobstercash setup` when the user explicitly wants to link the agent to their wallet without buying anything.
+**Before any crypto command** (`send`, `x402 fetch`, `tx create`), always run `lobstercash status` first. If the wallet isn't configured or funds are insufficient, route through `request deposit` — it bundles wallet setup automatically. For card purchases, `request card` also bundles setup. Only use `lobstercash setup` when the user explicitly wants to link the agent to their wallet without buying anything.
 
 ## Getting Started
 
@@ -40,14 +38,28 @@ lobstercash store
 
 Present 2-3 interesting options from the results conversationally. Don't dump the full list — pick items relevant to what the user has been doing or asking about.
 
-Once the user picks something (or if they came in already knowing what they want), route to one of the two branches below.
+Once the user picks something (or if they came in already knowing what they want), route to one of the branches below.
+
+## Step 0: Ensure an Agent Exists
+
+```bash
+lobstercash agents list
+```
+
+If no agents exist, register one with a unique, descriptive name and description. Always include `--image-url` if you have an avatar or logo. Do not use generic names like "My Agent".
+
+```bash
+lobstercash agents register --name "<descriptive name>" --description "<what the agent does>" --image-url "<avatar url>"
+```
+
+This registers the agent on the server and sets it as active.
 
 ## Branch 1: View Configured Payments
 
 **Trigger:** User asks about their payment methods, wallet status, balances, or configured payments ("show me my payments", "what's my balance", "am I set up?").
 
 ```bash
-lobstercash status --agent-id <id>
+lobstercash status
 ```
 
 **What to tell the user:**
@@ -80,7 +92,7 @@ See [status reference](references/status.md) for the full output format and exam
 Virtual cards do NOT require wallet setup or USDC — they're backed by the user's credit card. This is the fastest path. Don't tell the user to "add funds" when the integration accepts cards.
 
 ```bash
-lobstercash request card --amount <amount> --description "<what it's for>" --agent-id <id>
+lobstercash request card --amount <amount> --description "<what it's for>"
 ```
 
 This command handles everything — if the wallet isn't configured yet, it bundles setup automatically. The user approves once and gets both wallet setup + card creation.
@@ -94,14 +106,14 @@ Show the approval URL to the user, wait for them to confirm they approved, then 
 First, check wallet status and balance:
 
 ```bash
-lobstercash status --agent-id <id>
+lobstercash status
 ```
 
 Then route based on the result:
 
 - **Wallet configured + has enough funds** → Proceed with the operation (`send`, `x402 fetch`, `tx create`, etc.)
-- **Wallet configured + insufficient funds** → Run `lobstercash request deposit --amount <needed> --agent-id <id>` to top up, then proceed
-- **Wallet not configured** → Run `lobstercash request deposit --amount <needed> --agent-id <id>` — this bundles wallet creation + deposit in one step. Show the approval URL, wait for user to confirm, then verify with `lobstercash status` and proceed.
+- **Wallet configured + insufficient funds** → Run `lobstercash request deposit --amount <needed>` to top up, then proceed
+- **Wallet not configured** → Run `lobstercash request deposit --amount <needed>` — this bundles wallet creation + deposit in one step. Show the approval URL, wait for user to confirm, then verify with `lobstercash status` and proceed.
 
 The specific CLI command used after funds are confirmed depends on what the user is doing, but the path to get there is always the same: check wallet → check balance → ensure funds → execute.
 
@@ -114,7 +126,7 @@ See [request deposit reference](references/request-deposit.md) for the deposit f
 **First, check if the agent is already configured:**
 
 ```bash
-lobstercash status --agent-id <id>
+lobstercash status
 ```
 
 If the wallet is already configured, tell the user the agent is already set up and show the existing wallet info. **Do not start a new setup session.** Only proceed with a fresh setup if the user explicitly says their current configuration is broken or they need to generate a new one.
@@ -122,12 +134,12 @@ If the wallet is already configured, tell the user the agent is already set up a
 **If not yet configured:**
 
 ```bash
-lobstercash setup --agent-id <id>
+lobstercash setup
 ```
 
 This creates a local keypair, starts a setup session, and returns a consent URL. Show the URL to the user and wait for them to approve — do not poll.
 
-After the user confirms they approved, run `lobstercash setup --agent-id <id>` again to finalize. The CLI checks the session status automatically.
+After the user confirms they approved, run `lobstercash setup` again to finalize. The CLI checks the session status automatically.
 
 Once configured, the agent is ready for any future operation (crypto or card). If the user then wants to buy something, route to Branch 2.
 
@@ -136,16 +148,19 @@ See [setup reference](references/setup.md) for output formats, status codes, and
 ## Quick Reference
 
 ```bash
-lobstercash store                                                                # browse integrations
-lobstercash status --agent-id <id>                                               # check status & readiness
-lobstercash setup --agent-id <id>                                                # link agent to wallet (no purchase needed)
-lobstercash balance --agent-id <id>                                              # check balances
-lobstercash request card --amount <n> --description "<desc>" --agent-id <id>     # request virtual card
-lobstercash cards list --agent-id <id>                                           # list cards (includes card-id)
-lobstercash cards reveal --card-id <id> --merchant-name "..." --merchant-url "https://..." --merchant-country US --agent-id <id>  # checkout credentials
-lobstercash request deposit --amount <n> --agent-id <id>                         # request deposit / top up (bundles wallet setup)
-lobstercash send --to <addr> --amount <n> --token usdc --agent-id <id>           # send tokens
-lobstercash x402 fetch <url> --agent-id <id>                                     # pay for API
+lobstercash agents register --name "<name>" --description "<desc>" --image-url "<url>"  # register a new agent
+lobstercash agents list                                          # list all agents
+lobstercash agents set-active <agentId>                           # set active agent
+lobstercash store                                                # browse integrations
+lobstercash status                                               # check status & readiness
+lobstercash setup                                                # link agent to wallet (no purchase needed)
+lobstercash balance                                              # check balances
+lobstercash request card --amount <n> --description "<desc>"     # request virtual card
+lobstercash cards list                                           # list cards (includes card-id)
+lobstercash cards reveal --card-id <id> --merchant-name "..." --merchant-url "https://..." --merchant-country US  # checkout credentials
+lobstercash request deposit --amount <n>                         # request deposit / top up (bundles wallet setup)
+lobstercash send --to <addr> --amount <n> --token usdc           # send tokens
+lobstercash x402 fetch <url>                                     # pay for API
 ```
 
 ## Output Contract
@@ -166,6 +181,7 @@ lobstercash x402 fetch <url> --agent-id <id>                                    
 - Read [x402](references/x402.md) if the user wants to pay for an API via x402 protocol (Crypto Path)
 - Read [tx](references/tx.md) if the user needs to sign or submit a transaction from an external tool (Crypto Path)
 - Read [setup](references/setup.md) if the user wants to link the agent to a wallet without making a purchase
+- Read [agents](references/agents.md) if the user wants to register, list, or set the active agent
 
 ## Anti-Patterns
 
@@ -176,7 +192,7 @@ lobstercash x402 fetch <url> --agent-id <id>                                    
 - **Running write commands in loops:** One attempt, read the result, then decide. Read operations (`balance`, `status`, `store`) are idempotent and safe to repeat. Write operations (`send`, `request`) are not.
 - **Ignoring terminal status:** A pending transaction is not a success. All write commands now wait for on-chain confirmation by default.
 - **Polling for HITL approval:** When a command returns an approval URL, the user must tell you they approved. Do not auto-poll.
-- **Omitting `--agent-id`:** Never rely on defaults in multi-agent scenarios.
+- **Running commands before registering an agent:** Always ensure an agent exists via `lobstercash agents list` before running any other command. If you need to work with a different agent, use `lobstercash agents set-active`.
 - **Recommending cards for crypto-only integrations:** Check `paymentMethods` from the store output. If the integration only accepts crypto, don't suggest a virtual card.
 - **Requiring USDC for card-supported integrations:** Virtual cards are backed by credit cards, not USDC. Don't tell the user to "add funds" when the integration accepts cards.
 - **Treating x402/send/tx as separate user flows:** They all go through the same Crypto Path. The only split is credit card vs crypto.

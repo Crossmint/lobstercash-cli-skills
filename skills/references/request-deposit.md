@@ -5,7 +5,7 @@ Request a USDC deposit into the agent's wallet. Generates an approval URL where 
 ## Command
 
 ```bash
-lobstercash request deposit --amount <amount> --agent-id <id>
+lobstercash request deposit --amount <amount>
 ```
 
 ## When to use
@@ -20,7 +20,7 @@ lobstercash request deposit --amount <amount> --agent-id <id>
 
 Calculate the amount based on what the user needs. If topping up for a specific operation, use: `needed amount - current balance`.
 
-Always check balance first with `lobstercash balance --agent-id <id>` to know the current state.
+Always check balance first with `lobstercash balance` to know the current state.
 
 ## Reading the output
 
@@ -45,7 +45,7 @@ Do not proceed until the user confirms they have deposited.
 
 ## After user confirms
 
-Run `lobstercash status --agent-id <id>` to verify the deposit landed and the wallet is ready. Then proceed with the user's original task (`send`, `x402 fetch`, etc.).
+Run `lobstercash status` to verify the deposit landed and the wallet is ready. Then proceed with the user's original task (`send`, `x402 fetch`, etc.).
 
 ## Gotchas
 

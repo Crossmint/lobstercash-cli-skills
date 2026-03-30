@@ -4,13 +4,13 @@ Send tokens from the agent wallet to a blockchain address. Use this when lobster
 
 ## Before sending — always check balance first
 
-Run: `lobstercash balance --agent-id <id>`
+Run: `lobstercash balance`
 
 Confirm the balance covers the amount plus a small buffer for fees.
 
 If balance is insufficient, stop and tell the user:
 "Your wallet has [X] [token]. This needs [Y] [token]."
-Then use `lobstercash request deposit --amount <needed> --agent-id <id>` to
+Then use `lobstercash request deposit --amount <needed>` to
 generate a deposit link for the user.
 
 ## Confirmation rule
@@ -23,8 +23,7 @@ Ensure you have the user's consent before sending. They should have either direc
 lobstercash send \
   --to <address> \
   --amount <amount> \
-  --token <token> \
-  --agent-id <id>
+  --token <token>
 ```
 
 The command waits for on-chain confirmation by default.

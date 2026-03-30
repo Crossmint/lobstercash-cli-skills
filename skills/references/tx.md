@@ -30,8 +30,7 @@ For a serialized transaction from an external source:
 ```
 lobstercash tx create \
   --type serialized \
-  --serialized-transaction <base58-encoded-transaction> \
-  --agent-id <id>
+  --serialized-transaction <base58-encoded-transaction>
 ```
 
 For a calls array:
@@ -39,8 +38,7 @@ For a calls array:
 ```
 lobstercash tx create \
   --type calls \
-  --calls '<json array>' \
-  --agent-id <id>
+  --calls '<json array>'
 ```
 
 Parse the output. You need these values from the result:
@@ -56,8 +54,7 @@ The output includes a ready-made `lobstercash tx approve` command you can copy.
 lobstercash tx approve \
   --id <transactionId> \
   --message <messageToSign> \
-  --encoding <messageToSignEncoding> \
-  --agent-id <id>
+  --encoding <messageToSignEncoding>
 ```
 
 The command waits for on-chain confirmation by default.
@@ -68,8 +65,7 @@ If you need to re-check after the fact:
 
 ```
 lobstercash tx status \
-  --id <transactionId> \
-  --agent-id <id>
+  --id <transactionId>
 ```
 
 ## Reading the output

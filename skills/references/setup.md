@@ -2,15 +2,23 @@
 
 Link this agent to your lobster.cash wallet. It gives the agent access to operate a blockchain wallet, as well as to request virtual cards and top ups. Use this when the user wants to connect the agent to their wallet **without** making a purchase. If the user wants to buy something, use `request card` or `request deposit` instead — they bundle setup automatically.
 
+## Prerequisite
+
+An agent must exist before running setup. If you haven't registered one yet, register one with a descriptive name, description, and image URL:
+
+```bash
+lobstercash agents register --name "<descriptive name>" --description "<what the agent does>" --image-url "<avatar url>"
+```
+
 ## Command
 
 ```bash
-lobstercash setup --agent-id <id>
+lobstercash setup
 ```
 
 ## Check first
 
-Run `lobstercash status --agent-id <id>` and read the output:
+Run `lobstercash status` and read the output:
 
 - `wallet.configured: true` — wallet is ready, do not run setup.
 - `wallet.configured: false` — wallet needs setup. Proceed to Step 1.
@@ -18,25 +26,23 @@ Run `lobstercash status --agent-id <id>` and read the output:
 ## Step 1 — Start setup
 
 ```bash
-lobstercash setup --agent-id <id>
+lobstercash setup
 ```
 
 Parse the output:
 
-- `status`: one of `pending_configuration`, `already_configured`, `configured`, `awaiting-approval`, `denied`
-- `consentUrl`: the URL the user must open (present when status is `pending_configuration` or `awaiting-approval`)
+- `outcome`: one of `already_active`, `pending`, `completed`
+- `consentUrl`: the URL the user must open (present when `outcome` is `pending` and a new session was created)
 
-If `status` is `already_configured` or `configured`, stop — the wallet is ready.
+If `outcome` is `already_active` or `completed`, stop — the wallet is ready.
 
 ## Step 2 — Guide the user to approve
 
-When `status` is `pending_configuration` or `awaiting-approval`:
-
-Show the `consentUrl` to the user:
+When `outcome` is `pending` and the CLI prints a consent URL, show it to the user:
 
 > To activate your wallet, open this link and approve it. Come back here when you're done.
 >
-> [consentUrl]
+> [consentUrl from CLI output]
 
 Do not proceed until the user confirms they have approved.
 Do not poll automatically. The user must tell you they approved.
@@ -46,14 +52,14 @@ Do not poll automatically. The user must tell you they approved.
 When the user says they approved, run:
 
 ```bash
-lobstercash setup --agent-id <id>
+lobstercash setup
 ```
 
 The CLI checks the session status automatically. Parse the output:
 
-- `"status": "configured"` — wallet is ready. Continue with the user's original task.
-- `"status": "awaiting-approval"` — not approved yet. Show the `consentUrl` again.
-- `"status": "denied"` — user denied. Run `lobstercash setup --agent-id <id>` again to generate a fresh consent URL.
+- `"outcome": "completed"` — wallet is ready. Continue with the user's original task.
+- `"outcome": "pending"` — not approved yet. Ask the user to approve the setup request.
+- If the session was denied or expired, the CLI starts a fresh setup automatically.
 
 ## After setup completes
 

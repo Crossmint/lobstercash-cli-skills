@@ -33,7 +33,6 @@ If the user said "I need a card for $25 for AWS" you already have both.
 lobstercash request card \
   --amount <amount> \
   --description "<description>" \
-  --agent-id <id>
 ```
 
 ### Reading the output
@@ -56,7 +55,7 @@ Do not proceed until the user confirms they have approved.
 
 ### After user approves
 
-Run: `lobstercash cards list --agent-id <id>`.
+Run: `lobstercash cards list`.
 
 Find the card with matching description (see `card-id=...` on each line). Report to user:
 "Your card is ready"
@@ -81,7 +80,7 @@ This command shows card metadata (description, limit, phase, and card ID) — no
 ### Command
 
 ```
-lobstercash cards list --agent-id <id>
+lobstercash cards list
 ```
 
 ### Reading the output
@@ -134,8 +133,7 @@ lobstercash cards reveal \
   --card-id <orderIntentId> \
   --merchant-name "<name>" \
   --merchant-url "<https://...>" \
-  --merchant-country <XX> \
-  --agent-id <id>
+  --merchant-country <XX>
 ```
 
 ### What you need from context
