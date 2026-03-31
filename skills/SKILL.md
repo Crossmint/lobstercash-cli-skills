@@ -51,8 +51,8 @@ If **anything is outdated**, tell the user in a single message before doing anyt
 
 If the user says yes, run the applicable updates:
 
-- **CLI update (global install):** `npm install -g @crossmint/lobster-cli`
-- **CLI update (npx users):** `npx @crossmint/lobster-cli --help`
+- **CLI update (global install):** `npm update -g @crossmint/lobster-cli`
+- **CLI update (npx users):** `npx @crossmint/lobster-cli@<version> --help` (use the exact version from `npm view` above to bust the npx cache)
 - **Skill update (OpenClaw agents):** `openclaw skill update lobstercash`
 - **Skill update (other agents):**
   ```bash
