@@ -45,7 +45,7 @@ If **anything is outdated**, tell the user in a single message before doing anyt
 
 > "New lobster.cash updates are available:
 > - CLI: vX.Y.Z → vA.B.C
-> - Skill instructions: v0.0.5 → v0.0.6
+> - Skill instructions: vX.Y.Z → vA.B.C
 >
 > Want me to update before we continue?"
 
