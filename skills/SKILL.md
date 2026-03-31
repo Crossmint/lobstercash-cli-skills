@@ -28,53 +28,40 @@ After installation, all commands are available via the `lobstercash` binary.
 
 ## Preflight: Stay Current
 
-**Run these checks once at the start of each session, before executing any other `lobstercash` command.** This keeps your CLI and skill files up to date — similar to how zsh prompts "a new version is available" on launch.
+**Run this check once at the start of each session, before executing any other `lobstercash` command.** This keeps everything up to date — similar to how zsh prompts "a new version is available" on launch.
 
-### 1. Check CLI version
-
-```bash
-npm view @crossmint/lobster-cli version
-lobstercash --version
-```
-
-Compare the two outputs. If the npm registry version is newer than the local version (or if `lobstercash` is not found), **tell the user before doing anything else**:
-
-> "A new version of the lobster.cash CLI is available (vX.Y.Z → vA.B.C). Want me to update before we continue?"
-
-If the user says yes, update:
-
-- **Global install:** `npm install -g @crossmint/lobster-cli@latest`
-- **npx users:** `npx @crossmint/lobster-cli@latest --help` (one-time run with `@latest` to refresh the npx cache)
-
-If the user declines, continue with the current version — do not block.
-
-### 2. Check skill files
-
-Compare the local `metadata.version` in this file's frontmatter against the remote version:
+Run both of these commands silently:
 
 ```bash
+npm view @crossmint/lobster-cli version        # latest CLI version on npm
+lobstercash --version                           # local CLI version (may fail if not installed)
 curl -sL https://raw.githubusercontent.com/Crossmint/lobstercash-cli-skills/main/skills/SKILL.md | head -10
+# compare remote metadata.version against the local one in this file's frontmatter
 ```
 
-If the remote `metadata.version` is newer than the local one, **tell the user**:
+If **everything is current** (CLI version matches npm and skill `metadata.version` matches remote), proceed silently — do not mention versioning to the user.
 
-> "Updated lobster.cash skill instructions are available (v1.0.0 → vX.Y.Z). Want me to update before we continue?"
+If **anything is outdated**, tell the user in a single message before doing anything else. Include only the items that need updating:
 
-If the user says yes, update:
+> "New lobster.cash updates are available:
+> - CLI: vX.Y.Z → vA.B.C
+> - Skill instructions: v1.0.0 → v1.1.0
+>
+> Want me to update before we continue?"
 
-- **OpenClaw agents:** `openclaw skill update lobstercash`
-- **Other agents (Claude Code, Cursor, etc.):**
+If the user says yes, run the applicable updates:
+
+- **CLI update (global install):** `npm install -g @crossmint/lobster-cli@latest`
+- **CLI update (npx users):** `npx @crossmint/lobster-cli@latest --help` (one-time `@latest` run to refresh the cache)
+- **Skill update (OpenClaw agents):** `openclaw skill update lobstercash`
+- **Skill update (other agents):**
   ```bash
   npx skills add https://github.com/Crossmint/lobstercash-cli-skills --global --yes
   ```
 
-  After updating, **re-read this SKILL.md from the top** — instructions or references may have changed.
+If the skill files were updated, **re-read this SKILL.md from the top** — instructions or references may have changed.
 
-If the user declines, continue with the current version.
-
-### 3. All up to date
-
-If both the CLI and skill files are already at the latest version, proceed silently — do not mention versioning to the user.
+If the user declines, continue with the current versions — do not block.
 
 **Before any crypto command** (`send`, `x402 fetch`, `tx create`), always run `lobstercash status` first. If the wallet isn't configured or funds are insufficient, route through `request deposit` — it bundles wallet setup automatically. For card purchases, `request card` also bundles setup. Only use `lobstercash setup` when the user explicitly wants to link the agent to their wallet without buying anything.
 
