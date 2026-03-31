@@ -56,7 +56,7 @@ If the user says yes, run the applicable updates:
 - **Skill update (OpenClaw agents):** `openclaw skill update lobstercash`
 - **Skill update (other agents):**
   ```bash
-  npx skills update lobstercash
+  npx skills add https://github.com/Crossmint/lobstercash-cli-skills --global --yes
   ```
 
 If the skill files were updated, **re-read this SKILL.md from the top** — instructions or references may have changed.
