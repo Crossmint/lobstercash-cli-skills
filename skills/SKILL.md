@@ -2,6 +2,8 @@
 name: lobstercash
 description: >
   Use this skill when the user wants to spend money, make purchases, send crypto, pay for APIs, or manage an AI agent's payment wallet. Covers buying products online with credit cards, sending tokens, paying for x402 protocol APIs, checking balances, depositing funds, browsing available services, and signing on-chain transactions — all with secure guardrails, and appropriate human controls. Trigger on any spending or wallet intent: "buy this", "pay for that", "send tokens", "how much do I have", "what can I buy", "top up my wallet", "get a card", or "set up payments" — even if the user doesn't mention "lobster", "crypto", or "Solana" directly.
+metadata:
+  version: "1.0.0"
 ---
 
 # Lobster Cash CLI Skill
@@ -13,16 +15,46 @@ The Lobster Cash CLI (`lobstercash`) gives AI agents payment tools — a blockch
 Install and run the CLI via npx — no global install required:
 
 ```bash
-npx @crossmint/lobster-cli --help
+npx @crossmint/lobster-cli@latest --help
 ```
 
 Or install globally:
 
 ```bash
-npm install -g @crossmint/lobster-cli
+npm install -g @crossmint/lobster-cli@latest
 ```
 
 After installation, all commands are available via the `lobstercash` binary.
+
+## Preflight: Stay Current
+
+**Run these checks once at the start of each session, before executing any other `lobstercash` command.** This ensures you always work with the latest CLI and skill instructions — like `brew update` before `brew install`.
+
+### 1. Update the CLI
+
+Check whether a newer CLI version is available:
+
+```bash
+npm view @crossmint/lobster-cli version
+lobstercash --version
+```
+
+If the remote version is newer (or `lobstercash` is not found), update:
+
+- **Global install:** `npm install -g @crossmint/lobster-cli@latest`
+- **npx users:** Always use `npx @crossmint/lobster-cli@latest <command>` — the `@latest` tag bypasses the npx cache and guarantees the newest release.
+
+### 2. Update Skill Files
+
+Re-run the install command to pull the latest skill instructions and references:
+
+- **OpenClaw agents:** `openclaw skill update lobstercash`
+- **Other agents (Claude Code, Cursor, etc.):**
+  ```bash
+  npx skills add https://github.com/Crossmint/lobstercash-cli-skills --global --yes
+  ```
+
+This is safe to run even if already installed — it replaces the current version with the latest. **After updating, re-read this SKILL.md from the top** — instructions or references may have changed.
 
 **Before any crypto command** (`send`, `x402 fetch`, `tx create`), always run `lobstercash status` first. If the wallet isn't configured or funds are insufficient, route through `request deposit` — it bundles wallet setup automatically. For card purchases, `request card` also bundles setup. Only use `lobstercash setup` when the user explicitly wants to link the agent to their wallet without buying anything.
 
