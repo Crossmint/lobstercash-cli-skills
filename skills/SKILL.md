@@ -3,7 +3,7 @@ name: lobstercash
 description: >
   Use this skill when the user wants to spend money, make purchases, send crypto, pay for APIs, or manage an AI agent's payment wallet. Covers buying products online with credit cards, sending tokens, paying for x402 protocol APIs, checking balances, depositing funds, browsing available services, and signing on-chain transactions — all with secure guardrails, and appropriate human controls. Trigger on any spending or wallet intent: "buy this", "pay for that", "send tokens", "how much do I have", "what can I buy", "top up my wallet", "get a card", or "set up payments" — even if the user doesn't mention "lobster", "crypto", or "Solana" directly.
 metadata:
-  version: "0.0.4"
+  version: "0.0.5"
 ---
 
 # Lobster Cash CLI Skill
@@ -45,7 +45,7 @@ If **anything is outdated**, tell the user in a single message before doing anyt
 
 > "New lobster.cash updates are available:
 > - CLI: vX.Y.Z → vA.B.C
-> - Skill instructions: v0.0.4 → v0.0.5
+> - Skill instructions: v0.0.5 → v0.0.6
 >
 > Want me to update before we continue?"
 
