@@ -10,15 +10,40 @@ lobstercash agents register --name "<name>" [--description "<desc>"] [--image-ur
 
 Registers a new agent on the server and sets it as the active agent locally.
 
-- `--name` **(required)** — A **unique, descriptive, human-readable display name**. Use natural casing with spaces, not dashes (e.g. `"Alice Shopping Assistant"` not `"alice-shopping-assistant"`). Do **not** use generic names like `"My Agent"`.
+- `--name` **(required)** — A **unique, descriptive, human-readable display name**. Use natural casing with spaces, not dashes. Do **not** use generic names like `"My Agent"` or `"Assistant"`.
 - `--description` **(recommended)** — A short summary of what the agent does. This is shown to the user during approval.
-- `--image-url` **(recommended)** — An avatar or logo URL for the agent. This is displayed alongside the agent's name in the dashboard and approval screens.
+- `--image-url` **(recommended)** — An avatar or logo URL for the agent. This is displayed alongside the agent's name in the dashboard and approval screens. Preset logos for well-known agents are hosted at `https://lobster.cash/agent-avatars/`:
 
-Example:
+  | Agent       | URL                                                  |
+  | ----------- | ---------------------------------------------------- |
+  | Claude Code | `https://lobster.cash/agent-avatars/claude-code.svg` |
+  | Cursor      | `https://lobster.cash/agent-avatars/cursor.svg`      |
+  | Codex       | `https://lobster.cash/agent-avatars/codex.svg`       |
+  | Gemini      | `https://lobster.cash/agent-avatars/gemini.svg`      |
+  | OpenClaw    | `https://lobster.cash/agent-avatars/openclaw.svg`    |
+
+  If none of these match, pass any publicly accessible image URL, or none at all.
+
+#### Choosing a good name
+
+Pick the name that will be most recognizable to the user on the dashboard and in approval prompts. Use your judgment — there is no single formula.
+
+- **If you have a well-known identity, prefer that.** Agents with established names should use them: `"Claude Code"`, `"Devin"`, `"Cline"`, `"OpenClaw"`, or whatever the user already knows you as. If the user has configured a custom display name for you, use that.
+- **If a task-specific name is more useful, use that instead.** When you are purpose-built for a particular job — shopping, research, scheduling — a descriptive name like `"Alice's Shopping Assistant"` or `"Travel Planner"` may be clearer than a generic runtime name.
+- **When in doubt, combine both.** Something like `"Claude Code — Research"` works if you want to convey both identity and purpose.
+
+The goal: when the user sees the name on an approval screen, they should immediately know _which agent_ is asking and _what it does_.
+
+Examples:
 
 ```bash
 lobstercash agents register \
-  --name "Alice Shopping Assistant" \
+  --name "Claude Code" \
+  --description "Anthropic's AI coding agent" \
+  --image-url "https://lobster.cash/agent-avatars/claude-code.svg"
+
+lobstercash agents register \
+  --name "Alice's Shopping Assistant" \
   --description "Finds deals and buys products for Alice" \
   --image-url "https://example.com/alice-avatar.png"
 ```
