@@ -15,10 +15,10 @@ npm install @crossmint/lobster-cli
 lobstercash setup
 
 # 2. Check balance
-lobstercash balance
+lobstercash crypto balance
 
 # 3. Send USDC
-lobstercash send --to <address> --amount 10
+lobstercash crypto send --to <address> --amount 10
 ```
 
 ## For agents
@@ -30,7 +30,7 @@ If you are an AI agent using this CLI, read the skill files in `skills/` before 
 - All commands produce human-readable output to stdout
 - Errors go to stderr as plain text
 - Exit 0 = success, 1 = failure
-- Most commands accept `--agent-id <id>` to target a specific agent's wallet
+- Use `lobstercash agents set-active` to change the active agent
 
 ## Global options
 
@@ -46,66 +46,98 @@ If you are an AI agent using this CLI, read the skill files in `skills/` before 
 Generate a local keypair and start the consent flow. Run again after approval to finalize.
 
 ```bash
-lobstercash setup [--agent-id <id>]
+lobstercash setup
 ```
 
-### `balance`
+### `status`
+
+Check agent status: wallet setup, balances, virtual cards, and payment readiness.
+
+```bash
+lobstercash status
+```
+
+### `examples`
+
+Show real, working examples of what agents can do with lobster.cash.
+
+```bash
+lobstercash examples
+```
+
+### `crypto balance`
 
 Check wallet balances.
 
 ```bash
-lobstercash balance [--agent-id <id>]
+lobstercash crypto balance
 ```
 
-### `send`
+### `crypto send`
 
 Send tokens in a single step (create + sign + approve).
 
 ```bash
-lobstercash send --to <address> --amount <amount> [--token usdc] [--timeout 60000] [--agent-id <id>]
+lobstercash crypto send --to <address> --amount <amount> [--token usdc] [--timeout 60000]
 ```
 
-### `tx create`
+### `crypto deposit`
+
+Generate a deposit request URL for human approval. Bundles wallet setup if needed.
+
+```bash
+lobstercash crypto deposit --amount <amount> --description "<desc>"
+```
+
+### `crypto x402 fetch`
+
+Fetch an x402-protected URL, automatically handling payment.
+
+```bash
+lobstercash crypto x402 fetch <url> [--network mainnet-beta] [--json '<body>'] [--header "Key: Value"] [--debug]
+```
+
+### `crypto tx create`
 
 Create a transaction without approving it.
 
 ```bash
 # Transfer
-lobstercash tx create --type transfer --to <address> --amount <amount> [--token usdc]
+lobstercash crypto tx create --type transfer --to <address> --amount <amount> [--token usdc]
 
 # Serialized transaction
-lobstercash tx create --type serialized --serialized-transaction <data>
+lobstercash crypto tx create --type serialized --serialized-transaction <data>
 
 # Contract calls
-lobstercash tx create --type calls --calls '<json array>'
+lobstercash crypto tx create --type calls --calls '<json array>'
 ```
 
-### `tx approve`
+### `crypto tx approve`
 
 Approve a pending transaction by signing.
 
 ```bash
 # Let the CLI sign the message from tx create
-lobstercash tx approve --id <txId> --message <msg> [--encoding utf8]
+lobstercash crypto tx approve --id <txId> --message <msg> [--encoding utf8]
 
 # Or provide a pre-computed signature
-lobstercash tx approve --id <txId> --signature <sig>
+lobstercash crypto tx approve --id <txId> --signature <sig>
 ```
 
-### `tx status`
+### `crypto tx status`
 
 Check transaction status. Waits for a terminal state by default.
 
 ```bash
-lobstercash tx status --id <txId> [--timeout 60000]
+lobstercash crypto tx status --id <txId> [--timeout 60000]
 ```
 
-### `request card`
+### `cards request`
 
 Generate a virtual card request URL for human approval.
 
 ```bash
-lobstercash request card --amount <amount> --description "<description>" [--agent-id <id>]
+lobstercash cards request --amount <amount> --description "<description>"
 ```
 
 ### `cards list`
@@ -113,20 +145,44 @@ lobstercash request card --amount <amount> --description "<description>" [--agen
 List virtual card order intents for the agent wallet.
 
 ```bash
-lobstercash cards list [--agent-id <id>]
+lobstercash cards list
 ```
 
-### `x402 fetch`
+### `cards reveal`
 
-Fetch an x402-protected URL, automatically handling payment.
+Reveal virtual card credentials for a purchase.
 
 ```bash
-lobstercash x402 fetch <url> [--network mainnet-beta] [--json '<body>'] [--header "Key: Value"] [--debug] [--agent-id <id>]
+lobstercash cards reveal --card-id <id> --merchant-name "<name>" --merchant-url "<url>" --merchant-country <XX>
 ```
 
-## Multi-agent support
+## Agent Management
 
-Most commands accept `--agent-id <id>` to operate on a specific agent's wallet. The default agent ID is a stable device UUID persisted at `~/.lobster/device.json` (overridable via `LOBSTER_DEVICE_ID`). Each agent has its own keypair, tokens, and smart wallet.
+Multiple agents are managed with `lobstercash agents register`, `lobstercash agents list`, and `lobstercash agents set-active`. Each agent has its own keypair, tokens, and smart wallet. Other commands use whichever agent is currently active.
+
+### `agents register`
+
+Registers a new agent on the server and sets it as active locally.
+
+```bash
+lobstercash agents register --name <name> [--description <desc>] [--image-url <url>]
+```
+
+### `agents list`
+
+Lists all local agents and shows which is active.
+
+```bash
+lobstercash agents list
+```
+
+### `agents set-active`
+
+Sets the active agent.
+
+```bash
+lobstercash agents set-active <agentId>
+```
 
 ## Library usage
 
@@ -149,7 +205,7 @@ See [src/index.ts](src/index.ts) for the full list of exports.
 
 ## Storage
 
-Wallets are stored at `~/.lobster/wallets.json` (mode `0600`). Override the directory with the `LOBSTER_CASH_WALLETS_DIR` environment variable. On first run, existing wallets are auto-migrated from the legacy path `~/.openclaw/lobster-cash/wallets.json`.
+Agent data and wallet keys are stored in `~/.lobster/agents.json` (mode `0600`). Override the directory with the `LOBSTER_CASH_WALLETS_DIR` environment variable. On first run, existing data is auto-migrated from `wallets.json` or the legacy path `~/.openclaw/lobster-cash/wallets.json`.
 
 ## Output
 
