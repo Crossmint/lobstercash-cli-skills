@@ -1,11 +1,11 @@
-# Request Card — Virtual Card for Purchases
+# Cards Request — Virtual Card for Purchases
 
 Request a virtual card backed by the user's credit card. This is the fastest payment path — no USDC or wallet funding needed. If the wallet isn't configured yet, this command bundles setup automatically.
 
 ## Command
 
 ```bash
-lobstercash request card --amount <amount> --description "<description>"
+lobstercash cards request --amount <amount> --description "<description>"
 ```
 
 ## What you need before running
@@ -47,5 +47,5 @@ Run `lobstercash cards list` to verify the card was created. Then proceed with t
 
 - Virtual cards do NOT require USDC — they're backed by the user's credit card
 - If the wallet isn't configured, setup is bundled automatically — do not run `lobstercash setup` first
-- Only use this when `paymentMethods` includes `card` (check `lobstercash store`) — do not recommend for crypto-only integrations
+- Only use this when the integration supports `card` payments — do not recommend for crypto-only integrations
 - Write operation — do not retry automatically or if the user declines
