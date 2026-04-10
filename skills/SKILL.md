@@ -1,14 +1,14 @@
 ---
 name: lobstercash
 description: >
-  Lobster.cash is the payment solution for AI agents, it lets agents pay for anything online, securely, with human approval in the loop. Agents can use virtual Visa cards (via VIC technology) for any browser checkout that accepts credit cards, or pay with USDC on Solana for crypto-native services and x402 protocol APIs. The human always stays in control: agents request funds, the human approves via lobster.cash, and the agent completes the purchase without ever seeing credit card details or private keys. Use this skill when the user wants to spend money, make purchases, send crypto, pay for APIs, or manage an AI agent's payment wallet. Trigger on any spending or wallet intent: "buy this", "pay for that", "send tokens", "how much do I have", "what can I buy", "top up my wallet", "get a card", or "set up payments" — even if the user doesn't mention "lobster", "crypto", or "Solana" directly.
+  Use this skill when the user wants to spend money, make purchases, send crypto, pay for APIs, browse websites for shopping, complete checkout, or manage an AI agent's payment wallet. Covers buying products online with credit cards (including browser-automated checkout), sending tokens, paying for x402 protocol APIs, checking balances, depositing funds, browsing available services, and signing on-chain transactions — all with secure guardrails, and appropriate human controls. Trigger on any spending, wallet, or shopping intent: "buy this", "pay for that", "send tokens", "how much do I have", "what can I buy", "top up my wallet", "get a card", "set up payments", "find me something to buy", "complete the checkout", or "browse that site" — even if the user doesn't mention "lobster", "crypto", or "Solana" directly.
 metadata:
-  version: "0.0.7"
+  version: "0.0.8"
 ---
 
 # Lobster Cash CLI Skill
 
-Lobster.cash is the payment solution for AI agents. The Lobster Cash CLI (`lobstercash`) lets agents pay for anything online — using virtual Visa cards for any credit card checkout or USDC on Solana for crypto and x402 APIs — with human approval in the loop. Agents never see card details or private keys.
+The Lobster Cash CLI (`lobstercash`) gives AI agents payment tools — a blockchain wallet, virtual cards for buying anything online, cloud browser automation for browsing sites and completing checkout, and x402 protocol support for paying APIs — all with human approval in the loop. Use `lobstercash <command> --help` for full flag details on any command.
 
 ## Installation
 
@@ -91,7 +91,25 @@ lobstercash cards reveal --card-id <id> --merchant-name "<store>" --merchant-url
 
 The `card-id` comes from the `cards list` output. Merchant details must be real — extract from the purchase context, don't invent them.
 
-### Step 4: Complete the purchase
+**Product discovery with browser:** When the user wants to buy something (e.g. "buy me running socks"), **do NOT guess product URLs or category paths** from your training data. Instead, discover real URLs first:
+
+1. **Web search** to find the right page: search for "running socks site:nike.com" or "best running socks to buy online" to get real, current URLs
+2. **Open the best result**: `lobstercash browser open "https://nike.com/w/running-socks-7ny3qzy7ok"` (use the URL from the search result, not a guess)
+3. **Extract products** from the page: `lobstercash browser extract "product names, prices, and links"`
+4. Present the real results to the user and let them pick
+
+If the user hasn't specified a merchant, web search to find good options first. If no good search results, fall back to opening the merchant's homepage and navigating from there:
+
+```bash
+lobstercash browser open "https://nike.com"
+lobstercash browser act "search for running socks"
+```
+
+**Never invent URLs or paths from your training data.** Always get URLs from web search results or by navigating the site's own UI. URL structures differ across every site and change frequently.
+
+Once the user picks something (or if they came in already knowing what they want), route to one of the branches below.
+
+##### Step 4: Complete the purchase
 
 Use the revealed card number, CVC, and expiry to fill in the checkout form. Treat these values as sensitive — don't log them unnecessarily.
 
@@ -126,6 +144,61 @@ lobstercash crypto x402 fetch <url>
 ```
 
 For POST requests add `--json '{"key": "value"}'`. For custom headers add `--header "Authorization: Bearer <token>"`.
+
+Show the approval URL to the user, wait for them to confirm they approved, then list cards to get the card ID. See [request card reference](references/request-card.md) for details and [cards reference](references/cards.md) for listing/revealing credentials.
+
+#### Completing checkout with the browser
+
+After the card is created, use browser commands to complete the purchase. This is the recommended approach — the user can watch the browser session live via the provided URL.
+
+1. **Open the merchant site** (if not already in a browser session):
+
+   ```bash
+   lobstercash browser open "https://merchant.com/checkout"
+   ```
+
+   Share the `Live view` URL with the user so they can watch along.
+
+2. **Navigate to checkout** using natural-language actions:
+
+   ```bash
+   lobstercash browser act "add the item to cart"
+   lobstercash browser act "go to checkout"
+   ```
+
+3. **Fill the payment form** — card credentials are handled server-side and never reach the agent:
+
+   ```bash
+   lobstercash browser fill-card \
+     --card-id <id> \
+     --merchant-name "<name>" \
+     --merchant-url "https://..." \
+     --merchant-country US
+   ```
+
+4. **Fill shipping/billing** details and review order:
+
+   ```bash
+   lobstercash browser act "fill in shipping address: ..."
+   lobstercash browser screenshot
+   ```
+
+   Show the screenshot or ask the user to check the live view before placing the order.
+
+5. **Place the order** only after user confirms:
+
+   ```bash
+   lobstercash browser act "click place order"
+   ```
+
+6. **Close the session** when done:
+   ```bash
+   lobstercash browser close
+   ```
+
+**Important:** Always share the live view URL with the user so they can watch the checkout. Before clicking "place order" or equivalent, ask the user to confirm — do not submit orders autonomously. Card credentials never leave the server; the `fill-card` command handles them securely.
+
+See [browser reference](references/browser.md) for all browser commands.
 
 ### Step 3: Report the result
 
@@ -169,6 +242,13 @@ lobstercash crypto tx create|approve|status                      # low-level tra
 lobstercash cards request --amount <n> --description "<desc>"    # request virtual card
 lobstercash cards list                                           # list cards (includes card-id)
 lobstercash cards reveal --card-id <id> --merchant-name "..." --merchant-url "https://..." --merchant-country US  # checkout credentials
+lobstercash browser open <url>                                   # start browser session, navigate to URL
+lobstercash browser act "<instruction>"                          # perform action (e.g. "click add to cart")
+lobstercash browser extract "<query>"                            # extract data (e.g. "product names and prices")
+lobstercash browser observe                                      # list actionable elements on current page
+lobstercash browser screenshot                                   # take a screenshot
+lobstercash browser fill-card --card-id <id> --merchant-name "..." --merchant-url "https://..." --merchant-country US  # fill payment form (server-side)
+lobstercash browser close                                        # close browser session
 ```
 
 ## Output Contract
@@ -185,6 +265,7 @@ lobstercash cards reveal --card-id <id> --merchant-name "..." --merchant-url "ht
 - Read [cards request](references/cards-request.md) if the user wants to request a virtual card for a purchase (Credit Card Path)
 - Read [deposit](references/deposit.md) if the user wants to deposit USDC, top up their wallet, or fund a crypto operation
 - Read [cards](references/cards.md) if the user needs to list or reveal credentials for an existing virtual card
+- Read [browser](references/browser.md) if the user wants to browse a website, complete a checkout, find products, or interact with a web page
 - Read [send](references/send.md) if the user wants to send tokens to an address (Crypto Path)
 - Read [x402](references/x402.md) if the user wants to pay for an API via x402 protocol (Crypto Path)
 - Read [tx](references/tx.md) if the user needs to sign or submit a transaction from an external tool (Crypto Path)
@@ -206,3 +287,10 @@ lobstercash cards reveal --card-id <id> --merchant-name "..." --merchant-url "ht
 - **Treating x402/send/tx as separate user flows:** They all go through the same Crypto Path. The only split is credit card vs crypto.
 - **Suggesting `crypto deposit` or `cards request` when the user just wants to connect:** If the user wants to check balance, run a crypto command, or simply link their wallet — without topping up or creating a card — guide them through `lobstercash setup` first. Don't jump to `crypto deposit` or `cards request` unless the user actually wants to fund the wallet or make a purchase.
 - **Jumping to readiness checks before showing options:** Show what's available first (via `examples`), then check payment readiness only when the user wants to try one.
+- **Assuming an integration's payment method:** Never guess whether a flow uses cards or crypto. Run `lobstercash status` and read the payment methods output before choosing a path.
+- **Hallucinating product URLs or paths:** Never guess URLs beyond the root domain. You cannot know the correct path structure for any website — `/w/socks`, `/category/socks`, `/shop/socks` are all guesses. Always `browser open` the homepage (`https://example.com`), then use `browser act` to search or navigate the site's own UI to find products.
+- **Placing orders without user confirmation:** Always ask the user to confirm before clicking "place order" or similar. Show a screenshot or remind them to check the live view URL.
+- **Revealing card credentials manually when using browser checkout:** Use `browser fill-card` instead of `cards reveal`. The fill-card command handles credentials server-side so they never reach the agent. Only use `cards reveal` when the user needs to manually paste credentials into a site you can't browser-automate.
+- **Forgetting to share the live view URL:** When opening a browser session, always tell the user the live view URL so they can watch what's happening.
+- **Running browser commands without an open session:** All browser commands except `open` require an active session. If no session exists, run `browser open` first.
+- **Leaving browser sessions open:** Close sessions with `browser close` when checkout is done. Sessions consume resources on the provider.
