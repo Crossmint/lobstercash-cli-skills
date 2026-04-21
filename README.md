@@ -81,12 +81,12 @@ Send tokens in a single step (create + sign + approve).
 lobstercash crypto send --to <address> --amount <amount> [--token usdc] [--timeout 60000]
 ```
 
-### `crypto deposit`
+### `crypto request`
 
-Generate a deposit request URL for human approval. Bundles wallet setup if needed.
+Generate a crypto funding request URL for human approval. Bundles wallet setup if needed.
 
 ```bash
-lobstercash crypto deposit --amount <amount> --description "<desc>"
+lobstercash crypto request --amount <amount> --description "<desc>"
 ```
 
 ### `crypto x402 fetch`

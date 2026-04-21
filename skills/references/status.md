@@ -16,7 +16,7 @@ The command returns different fields depending on how far along the setup is.
 
 The agent hasn't been linked to a human's acount yet. Output only includes `agentId`, `wallet.configured: false`, and `authorized: false`. No balances, cards, or `dashboardUrl`.
 
-Next step: run `lobstercash cards request --amount <n> --description "<desc>"` or `lobstercash crypto deposit --amount <n> --description "<desc>"` — both handle wallet linking automatically.
+Next step: run `lobstercash cards request --amount <n> --description "<desc>"` or `lobstercash crypto request --amount <n> --description "<desc>"` — both handle wallet linking automatically.
 
 ### Linked (`authorized: true`)
 
