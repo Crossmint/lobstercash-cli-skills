@@ -10,9 +10,10 @@ lobstercash crypto balance
 
 ## Reading the output
 
-The output includes a `chain` field (currently always `solana`) indicating
+The output includes a `chain` field (e.g. `base`, `solana`) indicating
 which network the balances are on, followed by one line per token in the
-format `  <token>: <amount>`, e.g. `  usdc: 42.50`. Common tokens: `usdc`, `sol`.
+format `  <token>: <amount>`, e.g. `  usdc: 42.50`. Common tokens: `usdc`, plus
+the chain's native token (`eth` on Base, `sol` on Solana).
 
 Use the `chain` field to know which network the funds live on — this matters
 when deciding parameters for `send` or `x402 fetch`.

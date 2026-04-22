@@ -1,6 +1,6 @@
 # Send Tokens
 
-Send tokens from the agent wallet to a blockchain address. Use this when lobstercash is initiating the transfer itself. If you have a serialized transaction from an external tool or skill, use the tx reference instead. Note: currently only Solana chain is supported.
+Send tokens from the agent wallet to a blockchain address. Use this when lobstercash is initiating the transfer itself. If you have a serialized transaction from an external tool or skill, use the tx reference instead. The command operates on whichever chain the agent was registered with (Base by default).
 
 ## Before sending — always check balance first
 

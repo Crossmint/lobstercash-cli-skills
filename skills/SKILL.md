@@ -2,7 +2,7 @@
 name: lobstercash
 description: 'Use this skill when the user wants to spend money, make purchases, send crypto, pay for APIs, browse websites for shopping, complete checkout, or manage an AI agent''s payment wallet. Covers buying products online with credit cards (including browser-automated checkout), sending tokens, paying for x402 protocol APIs, checking balances, depositing funds, browsing available services, and signing on-chain transactions — all with secure guardrails, and appropriate human controls. Trigger on any spending, wallet, or shopping intent: "buy this", "pay for that", "send tokens", "how much do I have", "what can I buy", "top up my wallet", "get a card", "set up payments", "find me something to buy", "complete the checkout", or "browse that site" — even if the user doesn''t mention "lobster", "crypto", or "Solana" directly.'
 metadata:
-  version: "0.0.9"
+  version: "0.0.10"
 ---
 
 # Lobster Cash CLI Skill
@@ -60,12 +60,12 @@ Virtual cards are backed by the user's credit card — no USDC or wallet funding
 ##### Step 1: Request a virtual card
 
 ```bash
-lobstercash cards request --amount <amount> --description "<what it's for>" --period <period>
+lobstercash cards request --amount <amount> --description "<what it's for>" [--period <period>]
 ```
 
 Extract the amount, description, and period from context — don't ask if the user already told you (e.g. "buy me a $25 monthly AWS credit" → `--amount 25 --description "AWS credits" --period monthly`).
 
-The `--period` flag is **required** and sets the billing period for the virtual card mandate. Valid values: `weekly`, `monthly`, `yearly`. If the user doesn't specify a period, ask them — do not guess.
+The `--period` flag is **optional** and sets the billing period for the virtual card mandate. Valid values: `weekly`, `monthly`, `yearly`. When omitted the card is single-use. Only ask the user about period if the purchase is clearly recurring and they haven't specified one.
 
 This command handles everything — if the wallet isn't configured yet, it bundles setup automatically.
 
@@ -240,7 +240,7 @@ lobstercash crypto send --to <addr> --amount <n> --token usdc    # send tokens
 lobstercash crypto x402 fetch <url>                              # pay for API
 lobstercash crypto request --amount <n> --description "<desc>"    # request crypto funding / top up (bundles wallet setup)
 lobstercash crypto tx create|approve|status                      # low-level transaction management
-lobstercash cards request --amount <n> --description "<desc>" --period <weekly|monthly|yearly>  # request virtual card
+lobstercash cards request --amount <n> --description "<desc>" [--period <weekly|monthly|yearly>]  # request virtual card (period optional, omit for single-use)
 lobstercash cards list                                           # list cards (includes card-id)
 lobstercash cards reveal --card-id <id> --merchant-name "..." --merchant-url "https://..." --merchant-country US  # checkout credentials
 lobstercash browser open <url>                                   # start browser session, navigate to URL
@@ -283,6 +283,7 @@ lobstercash browser close                                        # close browser
 - **Ignoring terminal status:** A pending transaction is not a success. All write commands now wait for on-chain confirmation by default.
 - **Polling for HITL approval:** When a command returns an approval URL, the user must tell you they approved. Do not auto-poll.
 - **Running commands before registering an agent:** Always ensure an agent exists via `lobstercash agents list` before running any other command. If you need to work with a different agent, use `lobstercash agents set-active`.
+- **Asking the user which chain to use:** Agents default to Base silently. Do not ask "which chain do you want?" at registration — just register on Base. Only pass `--network solana` if the user has explicitly told you they need Solana, or when the context clearly implies the agent must operate on Solana (e.g. they already hold USDC on Solana, or the integration they want is Solana-only). Chain is fixed per agent; switching later means registering a new one.
 - **Recommending cards for crypto-only integrations:** If the integration only uses crypto, don't suggest a virtual card.
 - **Requiring USDC for card-supported integrations:** Virtual cards are backed by credit cards, not USDC. Don't tell the user to "add funds" when the integration accepts cards.
 - **Treating x402/send/tx as separate user flows:** They all go through the same Crypto Path. The only split is credit card vs crypto.

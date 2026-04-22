@@ -23,9 +23,9 @@ Next step: run `lobstercash cards request --amount <n> --description "<desc>"` o
 The agent is linked to a human's account. Output includes all fields:
 
 - `wallet.configured: true`
-- `wallet.address` — the Solana wallet address
+- `wallet.address` — the agent's wallet address on its chain (`0x…` on Base, base58 on Solana)
 - `authorized: true`
-- `balances` — token balances (USDC, SOL)
+- `balances` — token balances (USDC plus the chain's native token)
 - `cards` — virtual cards with phase (`active`, `requires-payment-method`, etc.)
 - `ready` — `true` if the agent can pay (has USDC > 0 OR an active virtual card)
 - `dashboardUrl` — link for the user to manage payments
