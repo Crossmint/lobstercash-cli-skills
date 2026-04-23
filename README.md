@@ -37,7 +37,7 @@ If you are an AI agent using this CLI, read the skill files in `skills/` before 
 | Flag             | Description     | Default                    |
 | ---------------- | --------------- | -------------------------- |
 | `--server <url>` | Server base URL | `https://www.lobster.cash` |
-| `--timeout <ms>` | Request timeout | `15000`                    |
+| `--timeout <ms>` | Request timeout | `30000`                    |
 
 ## Commands
 
