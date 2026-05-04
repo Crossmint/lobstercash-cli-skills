@@ -21,16 +21,17 @@ The `--type` flag determines what kind of transaction to create:
 
 ## Step 1 — Create the transaction
 
-The `--serialized-transaction` flag expects **base58** encoding. If the
-external source provides base64, decode it and re-encode as base58 before
-passing it to the CLI.
+The `--serialized-transaction` flag accepts the payload in **base58**
+(canonical), **base64**, or **0x-prefixed hex**. The proxy auto-detects
+the encoding, so you can pass Jupiter / RPC / wallet-builder output
+through verbatim without re-encoding it client-side.
 
 For a serialized transaction from an external source:
 
 ```
 lobstercash crypto tx create \
   --type serialized \
-  --serialized-transaction <base58-encoded-transaction>
+  --serialized-transaction <base58-or-base64-or-0xhex-transaction>
 ```
 
 For a calls array:
