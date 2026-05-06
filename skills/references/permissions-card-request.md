@@ -1,0 +1,57 @@
+# Permissions: Card Request — Virtual Card for Purchases
+
+Request a virtual card backed by the user's credit card. This is the fastest payment path — no USDC or wallet funding needed. If the wallet isn't linked yet, this command bundles wallet linking automatically.
+
+## Command
+
+```bash
+lobstercash permissions card request --amount <amount> --description "<description>"
+```
+
+## What you need before running
+
+Extract from context — do not ask if already clear:
+
+- `amount`: maximum USD that can be spent on this card (e.g. `25.00`)
+- `description`: what the card will be used for (e.g. `"AWS credits"`)
+
+If the user said "I need a card for $25 for AWS" you already have both.
+
+> **Note:** Subscription / recurring cards are **coming soon**. For now every card is single-use — request a fresh one per purchase. The `--period <weekly|monthly|yearly>` flag still exists in the CLI but should be omitted until subscriptions ship.
+
+## Reading the output
+
+The output contains:
+
+- `agentId`: the agent this card is for
+- `amount`: the requested amount
+- `description`: what the card is for
+- `approvalUrl`: the URL the user must open to approve
+- `setupSessionId`: present if wallet linking was bundled (first-time use)
+
+## After running
+
+Show the approval URL to the user:
+
+> To create this card I need your approval. Open this link:
+>
+> [approvalUrl]
+>
+> Come back here when you've approved it.
+
+Do not proceed until the user confirms they have approved. Do not poll.
+
+## After user approves
+
+Run `lobstercash permissions card list` to verify the card was created. Find the card with matching description (`card-id=...`) and report:
+
+> Your card is ready.
+
+Then proceed with the user's task — see [permissions-card-list.md](permissions-card-list.md) for listing details and [card-use.md](card-use.md) for getting the credentials at checkout.
+
+## Gotchas
+
+- Virtual cards do **not** require USDC — they're backed by the user's credit card.
+- If the wallet isn't linked yet, linking is bundled automatically — there is no separate setup step.
+- Only use this when the integration supports `card` payments — do not recommend for crypto-only integrations.
+- Write operation — do not retry automatically and do not retry if the user declines.

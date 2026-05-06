@@ -10,7 +10,7 @@ Confirm the balance covers the amount plus a small buffer for fees.
 
 If balance is insufficient, stop and tell the user:
 "Your wallet has [X] [token]. This needs [Y] [token]."
-Then use `lobstercash crypto request --amount <needed> --description "<reason>"` to
+Then use `lobstercash permissions crypto request --amount <needed> --description "<reason>"` to
 generate a funding request link for the user.
 
 ## Confirmation rule
