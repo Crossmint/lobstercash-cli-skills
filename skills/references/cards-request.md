@@ -1,11 +1,11 @@
-# Permissions: Card Request — Virtual Card for Purchases
+# Cards Request — Virtual Card for Purchases
 
-Request a virtual card backed by the user's credit card. This is the fastest payment path — no USDC or wallet funding needed. If the wallet isn't linked yet, this command bundles wallet linking automatically.
+Request a virtual card backed by the user's credit card. Conceptually this is a **card permission**: the user grants the agent a scoped, capped right to charge a specific amount for a specific purpose. The actual CLI command is `lobstercash cards request`. If the wallet isn't linked yet, this command bundles wallet linking automatically.
 
 ## Command
 
 ```bash
-lobstercash permissions card request --amount <amount> --description "<description>"
+lobstercash cards request --amount <amount> --description "<description>"
 ```
 
 ## What you need before running
@@ -43,15 +43,15 @@ Do not proceed until the user confirms they have approved. Do not poll.
 
 ## After user approves
 
-Run `lobstercash permissions card list` to verify the card was created. Find the card with matching description (`card-id=...`) and report:
+Run `lobstercash cards list` to verify the card was created. Find the card with matching description (`card-id=...`) and report:
 
 > Your card is ready.
 
-Then proceed with the user's task — see [permissions-card-list.md](permissions-card-list.md) for listing details and [card-use.md](card-use.md) for getting the credentials at checkout.
+Then proceed with the user's task — see [cards.md](cards.md) for listing details, reuse rules, and getting the credentials at checkout.
 
 ## Gotchas
 
 - Virtual cards do **not** require USDC — they're backed by the user's credit card.
-- If the wallet isn't linked yet, linking is bundled automatically — there is no separate setup step.
+- If the wallet isn't linked yet, linking is bundled automatically — do **not** run `lobstercash setup` first.
 - Only use this when the integration supports `card` payments — do not recommend for crypto-only integrations.
 - Write operation — do not retry automatically and do not retry if the user declines.

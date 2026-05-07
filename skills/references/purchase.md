@@ -38,7 +38,7 @@ lobstercash purchase run \
 
 ### Flags
 
-- `--card-id` (required) — the order intent ID of the virtual card to charge. From `lobstercash permissions card list` (`card-id=...`).
+- `--card-id` (required) — the order intent ID of the virtual card to charge. From `lobstercash cards list` (`card-id=...`).
 - `--explore-id <id>` — reuse a prior `purchase explore` session. When set, merchant flags become optional.
 - `--description` (required) — same description used in `purchase explore` (or a superset). The server uses it verbatim.
 - `--max-total "<amount>"` — maximum total including tax and shipping. **The order is placed automatically as long as the cart stays at or under this number** — there is no review-and-confirm step. Decline if the cart exceeds this.

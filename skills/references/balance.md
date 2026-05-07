@@ -35,7 +35,7 @@ tokens. Say "Your wallet is empty" not "wallet not found."
 
 If the balance is too low for what the user wants to do:
 Say: "Your wallet has [X] USDC. This needs [Y] USDC."
-Then use `lobstercash permissions crypto request --amount <needed> --description "<reason>"` to
+Then use `lobstercash crypto request --amount <needed> --description "<reason>"` to
 generate a funding request link for the user.
 
 Do not attempt the operation with insufficient funds. The error message

@@ -19,10 +19,10 @@ Only ask the user for fields you don't already have. If they say a field isn't n
 
 ## Step 2: Discover the product and price (`purchase explore`)
 
-**Ensure the wallet is linked first.** `purchase explore` and `purchase run` require an active wallet session and will exit with code 2 if one isn't linked — unlike `permissions card request` / `permissions crypto request`, they do **not** bundle wallet linking. Run `lobstercash status`:
+**Ensure the wallet is linked first.** `purchase explore` and `purchase run` require an active wallet session and will exit with code 2 if one isn't linked — unlike `cards request` / `crypto request`, they do **not** bundle wallet linking. Run `lobstercash status`:
 
 - **Wallet linked** → continue.
-- **Wallet not linked** → run `lobstercash permissions crypto request --amount 1.00 --description "Link wallet for upcoming purchase"`, share the approval URL with the user, and wait for them to confirm they approved before continuing. Use a small placeholder amount because at this point you don't yet know the purchase price — you'll size the actual card in Step 3b once explore returns the real total.
+- **Wallet not linked** → run `lobstercash setup`, share the consent URL with the user, and wait for them to confirm they approved before continuing. Don't try to bundle linking via `cards request` here — at this point you don't yet know the price, so you can't size the card correctly.
 
 Pack everything into one natural-language `--description` and run explore. Share the live view URL with the user so they can watch.
 
@@ -49,7 +49,7 @@ For full flag list, description-writing guidance, resume/poll syntax, and output
 Before creating a new card, list current cards and look for one that already covers this purchase.
 
 ```bash
-lobstercash permissions card list
+lobstercash cards list
 ```
 
 > **Note:** Subscription / recurring cards are coming soon — for now every card is single-use. The matching rules below already account for this; period-based matching will become relevant once subscriptions ship.
@@ -65,8 +65,8 @@ Each card (order intent) carries these fields you can compare against:
 
 Fields **NOT** to rely on:
 
-- **Remaining balance** — `permissions card list` only exposes the limit, not how much has been spent. Once subscription cards ship we won't be able to tell if this period's budget is already drained; trust the limit and let the merchant decline if exceeded.
-- **Whether the card has already been charged** — single-use cards can't be reused once they've been charged successfully, but `permissions card list` doesn't expose charge history. If the card looks unused (no purchase you initiated against it), assume it's available; otherwise request a new one.
+- **Remaining balance** — `cards list` only exposes the limit, not how much has been spent. Once subscription cards ship we won't be able to tell if this period's budget is already drained; trust the limit and let the merchant decline if exceeded.
+- **Whether the card has already been charged** — single-use cards can't be reused once they've been charged successfully, but `cards list` doesn't expose charge history. If the card looks unused (no purchase you initiated against it), assume it's available; otherwise request a new one.
 - `agentId` / `paymentMethodId` — internal bindings, not user-facing match signals.
 
 A card is **usable for this purchase** when **all** of the following are true:
@@ -82,23 +82,23 @@ Fork:
 - **Match found** → skip Step 3b and Step 4. Reuse its `card-id` and jump straight to **Step 5**. Tell the user briefly: "Reusing your existing $X card for [description]."
 - **No match** → continue to Step 3b.
 
-See [permissions card list reference](permissions-card-list.md) for the full output format and field semantics.
+See [cards list reference](cards.md) for the full output format and field semantics.
 
 ## Step 3b: Request a new virtual card sized to the discovered total
 
 Round the discovered total **up** to the nearest $5 so a small price drift at checkout doesn't decline the card (e.g. $47.23 → $50, $31.75 → $35). Tell the user the rounded amount and why.
 
 ```bash
-lobstercash permissions card request --amount <rounded> --description "<short product name>"
+lobstercash cards request --amount <rounded> --description "<short product name>"
 ```
 
 Cards are currently single-use only. **Subscription / recurring cards are coming soon** — when they ship you'll be able to add `--period <weekly|monthly|yearly>` for recurring purchases. Until then, omit `--period` (or rely on the default) and request a fresh card per purchase.
 
-This command bundles wallet linking if needed. See [permissions card request reference](permissions-card-request.md) for output format.
+This command bundles wallet linking if needed. See [cards request reference](cards-request.md) for output format.
 
 ## Step 4: Get user approval
 
-The `permissions card request` command outputs an `approvalUrl`. Show it to the user:
+The `cards request` command outputs an `approvalUrl`. Show it to the user:
 
 > To create this card I need your approval. Open this link:
 >
@@ -106,7 +106,7 @@ The `permissions card request` command outputs an `approvalUrl`. Show it to the 
 >
 > Come back here when you've approved it.
 
-**Do not proceed until the user confirms they approved.** Do not poll. After they confirm, run `lobstercash permissions card list` once to verify the new card is `active`, then continue.
+**Do not proceed until the user confirms they approved.** Do not poll. After they confirm, run `lobstercash cards list` once to verify the new card is `active`, then continue.
 
 ## Step 5: Complete the purchase (`purchase run`)
 
@@ -122,7 +122,7 @@ lobstercash purchase run \
 
 Share the live view URL with the user so they can watch the checkout. The agent will place the order automatically as long as the cart total stays at or below `--max-total`. Size `--max-total` to match what the user has approved.
 
-In this flow Browser Use fills the checkout form server-side using the card record — you do **not** need to call `card use` for the built-in flow. (`card use` is for the BYO flow and manual checkout.)
+In this flow Browser Use fills the checkout form server-side using the card record — you do **not** need to call `cards reveal` for the built-in flow. (`cards reveal` is for the BYO flow and manual checkout.)
 
 Handle the response the same way as explore: `completed` → done; `needs_user_input` → ask and resume with `--purchase-id <id> --answer "..."`; `running` → re-poll with `--purchase-id <id>`.
 
@@ -138,16 +138,16 @@ lobstercash purchase run --card-id <id> --explore-id <id> --description "<...>" 
 ## Browser-related references
 
 - Read [purchase](purchase.md) for full flag reference, single-phase fallback, dev-mock-card, description-writing tips, and resume/poll syntax
-- Read [permissions card request](permissions-card-request.md) for creating a new virtual card for a purchase (Step 3b)
-- Read [permissions card list](permissions-card-list.md) for listing existing cards and checking whether one can be reused (Step 3)
+- Read [cards request](cards-request.md) for creating a new virtual card for a purchase (Step 3b)
+- Read [cards list](cards.md) for listing existing cards and checking whether one can be reused (Step 3)
 
 ## Anti-patterns (browser flow specific)
 
-- **Running `purchase explore` / `purchase run` before the wallet is linked:** Both purchase commands require an active wallet session and exit with code 2 otherwise — they do **not** bundle wallet linking. Always run `lobstercash status` first; if the wallet isn't linked, run `lobstercash permissions crypto request` with a small placeholder amount and wait for user approval before calling `purchase explore`. (`permissions card request` and `permissions crypto request` _do_ bundle linking, but here you don't yet know the price to size the card.)
+- **Running `purchase explore` / `purchase run` before the wallet is linked:** Both purchase commands require an active wallet session and exit with code 2 otherwise — they do **not** bundle wallet linking. Always run `lobstercash status` first; if the wallet isn't linked, run `lobstercash setup` and wait for user approval before calling `purchase explore`. (`cards request` and `crypto request` _do_ bundle linking, but here you don't yet know the price or amount, so use the dedicated `setup` command.)
 - **Hallucinating product URLs or paths:** Never guess URLs beyond the root domain — `/w/socks`, `/category/socks`, `/shop/socks` are all guesses, and URL structures change. Don't bake guessed paths into the `purchase explore --description`. Either give explore the merchant homepage (e.g. `nike.com`) and let Browser Use navigate the site's own UI, or ground the description with a real URL pulled from web search results.
 - **Placing orders without user authorization:** `purchase run` always submits the order if the cart stays at or under `--max-total`, with no human approval at the review screen. Don't call it until the user has explicitly authorized this purchase, and size `--max-total` to match what they approved — it's the only guard against unexpected charges.
 - **Skipping `purchase explore` and going straight to `purchase run`:** Always discover the real product and price first so you can size the card to the actual total. The single-phase `purchase run` fallback (no `--explore-id`) only applies when the user has already given you the exact price and a real merchant URL — see [purchase reference](purchase.md).
-- **Requesting a new card without checking `permissions card list` first:** Always run `lobstercash permissions card list` after `purchase explore` and check whether an `active` card already covers this purchase (matching amount, currency, period, and purpose — see Step 3). Reusing a usable card avoids spamming the user with another approval link.
+- **Requesting a new card without checking `cards list` first:** Always run `lobstercash cards list` after `purchase explore` and check whether an `active` card already covers this purchase (matching amount, currency, period, and purpose — see Step 3). Reusing a usable card avoids spamming the user with another approval link.
 - **Reusing a card whose description doesn't fit the purchase:** The user approved each card for a specific purpose. Don't reuse an "AWS credits" card to buy enamel pins — request a new card scoped to the new purpose instead.
 - **Forgetting to share the live view URL:** Both `purchase explore` and `purchase run` return a live view URL. Always pass it to the user so they can watch the browser, especially before they confirm a final-review screen or answer a `needs_user_input` prompt.
 - **Guessing answers to `needs_user_input`:** When `purchase explore` or `purchase run` returns `needs_user_input`, the agent has reached a required choice it can't make on its own (size, paid shipping speed, missing address field, etc.). Ask the user with the returned question and options, then resume the _same_ session with `--explore-id` / `--purchase-id` and `--answer`. Never invent an answer.
