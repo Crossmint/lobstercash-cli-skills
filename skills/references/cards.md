@@ -1,18 +1,18 @@
-# Virtual Cards
+# Card Permissions
 
-Request, list, reveal credentials for checkout, and inspect virtual cards on the agent wallet.
+Request, list, reveal credentials for checkout, and inspect card permissions on the agent wallet.
 
-## What virtual cards are
+## What card permissions are
 
-Virtual cards are temporary, scoped payment cards generated from the user's saved card on file using Visa Intelligent Commerce and Mastercard Agent Pay. They work like disposable debit cards with a fixed spending limit — the card cannot be charged beyond the amount the user approved when creating it.
+A **card permission** is a temporary, scoped right to charge — generated from the user's saved card on file using Visa Intelligent Commerce and Mastercard Agent Pay. It behaves like a disposable debit card with a fixed spending limit: it cannot be charged beyond the amount the user approved when creating it.
 
 Key properties:
 
-- **Privacy-preserving:** The user's real card details (number, CVC, expiry) are never shared with the agent. The agent only ever sees the virtual card credentials, which are separate from the card on file.
-- **Scoped balance:** Each virtual card has a hard spending cap set at creation time. Once that limit is reached, the card declines further charges. This protects the user from overspending.
-- **Human approval required:** Creating a virtual card always requires the user to approve via a link. The agent cannot create or fund a card without explicit human consent.
+- **Privacy-preserving:** The user's real card details (number, CVC, expiry) are never shared with the agent. The agent only ever sees the card permission credentials, which are separate from the card on file.
+- **Scoped balance:** Each card permission has a hard spending cap set at creation time. Once that limit is reached, the card declines further charges. This protects the user from overspending.
+- **Human approval required:** Creating a card permission always requires the user to approve via a link. The agent cannot create or fund a card without explicit human consent.
 
-**Naming:** The API calls these _order intents_; the CLI and plugin expose them as _virtual cards_. Each card has a stable id: `orderIntentId`. For `lobstercash cards reveal`, pass that value as `--card-id`.
+**Naming:** The API calls these _order intents_; the CLI and plugin expose them as _card permissions_. Each card has a stable id: `orderIntentId`. For `lobstercash cards reveal`, pass that value as `--card-id`.
 
 ---
 
@@ -24,7 +24,7 @@ Key properties:
 
 Two pieces of information — extract from context, do not ask if already clear:
 
-- `amount`: maximum USD that can be spent on this virtual card (e.g. `25.00`). Other currencies will be supported soon.
+- `amount`: maximum USD that can be spent on this card permission (e.g. `25.00`). Other currencies will be supported soon.
 - `description`: what the card will be used for (e.g. `"AWS credits"`).
 
 If the user said "I need a card for $25 for AWS" you already have both. Do not ask about period today — it has no effect until subscription cards launch.
@@ -73,7 +73,7 @@ Show the error message from stderr.
 ### What NOT to do
 
 - Do not retry automatically if the user says they declined.
-- Do not explain how virtual cards work unless asked.
+- Do not explain how card permissions work unless asked.
 
 ---
 
@@ -150,9 +150,11 @@ If none match, fall back to `cards request`.
 
 ---
 
-## Revealing card credentials (checkout)
+## Revealing card permission credentials (checkout)
 
-Use when the user needs the **full card number, CVC, and expiry** to complete a purchase (e.g. paste into a merchant checkout). Only works for cards in **`active`** phase.
+Use when the user needs the credentials to complete a purchase (e.g. paste into a merchant checkout). Only works for cards in **`active`** phase.
+
+The returned values are **agent-protocol credentials** — Visa Intelligent Commerce or Mastercard Agent Pay tokens issued for this specific intent. They are **not** the user's real PAN. Their wire format looks like a card number, CVC, and expiry because that's what merchant forms accept.
 
 ### OpenClaw plugin
 

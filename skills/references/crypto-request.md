@@ -52,6 +52,6 @@ Run `lobstercash status` to verify the funds landed and the wallet is ready. The
 ## Gotchas
 
 - If the wallet isn't configured, setup is bundled automatically — do not run `lobstercash setup` first
-- Only needed for crypto operations — virtual cards (`cards request`) don't require USDC, so don't use this when `paymentMethods` includes `card`
+- Only needed for crypto operations — card permissions (`cards request`) don't require USDC, so don't use this when `paymentMethods` includes `card`
 - Always check balance first (`lobstercash crypto balance`) — know the current state before requesting
 - Write operation — do not retry automatically or if the user declines
