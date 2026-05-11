@@ -1,6 +1,6 @@
 # Setup — Link Agent to Wallet
 
-Link this agent to your lobster.cash wallet. It gives the agent access to operate a blockchain wallet, as well as to request virtual cards and top ups. Use this when the user wants to connect the agent to their wallet **without** making a purchase. If the user wants to buy something, use `cards request` or `crypto request` instead — they bundle setup automatically.
+Link this agent to your lobster.cash wallet. It gives the agent access to operate a blockchain wallet, as well as to request card permissions and top ups. Use this when the user wants to connect the agent to their wallet **without** making a purchase. If the user wants to buy something, use `cards request` or `crypto request` instead — they bundle setup automatically.
 
 ## Prerequisite
 
@@ -66,8 +66,6 @@ The CLI checks the session status automatically. Parse the output:
 Say: "Wallet ready. Your address is [walletAddress]."
 
 If the user originally asked for something specific (e.g. "buy X", "send tokens"), route to Branch 2 in the main skill file.
-
-If the user did not have a specific task, run `lobstercash examples` and present working examples so they can pick what to do next.
 
 ## Anti-Patterns
 

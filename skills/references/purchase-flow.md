@@ -1,10 +1,10 @@
 # Buy something online (browser-automated purchase flow)
 
-This reference describes the end-to-end flow for buying products online with a virtual card and Lobster Cash's built-in Browser Use automation. It applies when **`browser-enabled: true`** for this CLI install (see [SKILL.md](../SKILL.md) Section A). If `browser-enabled: false`, follow [purchase-flow-byo.md](purchase-flow-byo.md) instead — same end-to-end flow, but you drive the merchant browser yourself.
+This reference describes the end-to-end flow for buying products online with a card permission and Lobster Cash's built-in Browser Use automation. It applies when **`browser-enabled: true`** for this CLI install (see [SKILL.md](../SKILL.md) Section A). If `browser-enabled: false`, follow [purchase-flow-byo.md](purchase-flow-byo.md) instead — same end-to-end flow, but you drive the merchant browser yourself.
 
 Use when the user wants to purchase a product, subscription, domain, or any item from an online store. Purchases are **always browser-automated** via `purchase run` — Browser Use navigates the merchant's site, fills the checkout form, and stops at final review (or submits, when explicitly authorized).
 
-The flow is: discover the real product and price first, then size a virtual card to that price (or reuse an existing one), then run the automated checkout.
+The flow is: discover the real product and price first, then size a card permission to that price (or reuse an existing one), then run the automated checkout.
 
 ## Step 1: Gather info from the conversation
 
@@ -82,7 +82,7 @@ Fork:
 
 See [cards reference](cards.md) for the full `cards list` output format and field semantics.
 
-## Step 3b: Request a new virtual card sized to the discovered total
+## Step 3b: Request a new card permission sized to the discovered total
 
 Round the discovered total **up** to the nearest $5 so a small price drift at checkout doesn't decline the card (e.g. $47.23 → $50, $31.75 → $35). Tell the user the rounded amount and why.
 
@@ -135,7 +135,7 @@ lobstercash cards reveal --card-id <id> --merchant-name "..." --merchant-url "ht
 ## Browser-related references
 
 - Read [purchase](purchase.md) for full flag reference, single-phase fallback, dev-mock-card, description-writing tips, and resume/poll syntax
-- Read [cards request](cards-request.md) for creating a new virtual card for a purchase (Step 3b)
+- Read [cards request](cards-request.md) for creating a new card permission for a purchase (Step 3b)
 - Read [cards](cards.md) for listing existing cards and checking whether one can be reused (Step 3)
 
 ## Anti-patterns (browser flow specific)

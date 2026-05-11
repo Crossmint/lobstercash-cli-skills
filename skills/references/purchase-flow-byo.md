@@ -1,10 +1,10 @@
 # Buy something online — bring-your-own browser flow
 
-This is the purchase flow when **`browser-enabled: false`** (see [SKILL.md](../SKILL.md) Section A). It is the same end-to-end flow as [purchase-flow.md](purchase-flow.md), with one difference: **you (the agent) drive the merchant browser using whatever browser-automation tooling you already have available** in this environment (your IDE's browser tool, an MCP browser server, OpenClaw, Playwright/Puppeteer access, etc.). Lobster Cash still provides the virtual card, the user-approval flow, and `cards reveal` for credentials at checkout — it just doesn't drive the browser.
+This is the purchase flow when **`browser-enabled: false`** (see [SKILL.md](../SKILL.md) Section A). It is the same end-to-end flow as [purchase-flow.md](purchase-flow.md), with one difference: **you (the agent) drive the merchant browser using whatever browser-automation tooling you already have available** in this environment (your IDE's browser tool, an MCP browser server, OpenClaw, Playwright/Puppeteer access, etc.). Lobster Cash still provides the card permission, the user-approval flow, and `cards reveal` for credentials at checkout — it just doesn't drive the browser.
 
-If you have **no** browser-automation tooling available in this environment, stop and offer to run the checkout manually with the user — you'll get the card credentials with `cards reveal` and walk them through entering them at the merchant's checkout page themselves.
+If you have **no** browser-automation tooling available in this environment, stop and offer to run the checkout manually with the user — you'll get the card permission credentials with `cards reveal` and walk them through entering them at the merchant's checkout page themselves.
 
-The flow: discover the real product and price first (with your browser), size a virtual card to that price (or reuse an existing one), get user approval, then complete checkout (with your browser, using credentials from `cards reveal`).
+The flow: discover the real product and price first (with your browser), size a card permission to that price (or reuse an existing one), get user approval, then complete checkout (with your browser, using credentials from `cards reveal`).
 
 ## Step 1: Gather info from the conversation
 
@@ -19,7 +19,7 @@ Only ask the user for fields you don't already have. If they say a field isn't n
 
 ## Step 2: Discover the product and price (your browser tool)
 
-Use **your own browser tooling** to navigate the merchant's site, locate the product the user wants, add it to the cart (or get to a quote/total page), and capture the **final total** including tax and shipping. You need a real, current total so the next step can size the virtual card correctly.
+Use **your own browser tooling** to navigate the merchant's site, locate the product the user wants, add it to the cart (or get to a quote/total page), and capture the **final total** including tax and shipping. You need a real, current total so the next step can size the card permission correctly.
 
 While you work, share progress with the user — what site you're on, what you found, when you've reached the cart total. They should be able to follow along.
 
@@ -74,7 +74,7 @@ Fork:
 
 See [cards reference](cards.md) for the full `cards list` output format and field semantics.
 
-## Step 3b: Request a new virtual card sized to the discovered total
+## Step 3b: Request a new card permission sized to the discovered total
 
 Round the discovered total **up** to the nearest $5 so a small price drift at checkout doesn't decline the card (e.g. $47.23 → $50, $31.75 → $35). Tell the user the rounded amount and why.
 
@@ -102,7 +102,7 @@ The `cards request` command outputs an `approvalUrl`. Show it to the user:
 
 Now the card is ready and the cart is parked. Two sub-steps:
 
-### 5a — Reveal the card credentials
+### 5a — Reveal the card permission credentials
 
 ```bash
 lobstercash cards reveal \
@@ -114,7 +114,7 @@ lobstercash cards reveal \
 
 This prints the card number, expiry month/year, and CVC for that specific merchant. **Treat the output as highly sensitive.** Do not log or paste it anywhere outside of the merchant's checkout form. Do not share these details with the user; just use them yourself in the browser.
 
-See [cards reveal section in cards reference](cards.md#revealing-card-credentials-checkout) for full flag details and security notes.
+See [cards reveal section in cards reference](cards.md#revealing-card-permission-credentials-checkout) for full flag details and security notes.
 
 ### 5b — Drive checkout with your browser tool
 
